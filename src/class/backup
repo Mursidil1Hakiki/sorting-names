@@ -1,0 +1,120 @@
+import React, { Component } from 'react';
+// import mytext from './sorted-names.txt';
+
+class SortNameComp extends Component {
+
+    state = {
+        names: ""
+    }
+    //mengambil data dari file sorted-names.txt dan menyimpannya ke variabel names
+    handleGetData = () => {
+        fetch('/name-sorter/unsorted-names-list.txt')
+            .then((res) => {
+                return res.text();
+            }).then((data) => {
+                this.setState({
+                    names: data
+                });
+            });
+    }
+    //mengubah data pada variabel names menjadi array
+    handleDataToArray = () => {
+        let arrayNames = this.state.names.split('\n').filter(word => word.length > 0);
+        this.handleArrayToObject(arrayNames);
+    }
+    //mengubah data arry menjadi array of object
+    handleArrayToObject = (arrNames) => {
+        let arrObj = [];
+        arrNames.forEach(element => {
+            let arrayname = element.split(/\W+/);
+            let firstName = "";
+            let lastName = "";
+            for (let i = 0; i < arrayname.length; i++) {
+                if (i < arrayname.length - 1) {
+                    firstName += arrayname[i] + " ";
+                } else {
+                    lastName = arrayname[i];
+                }
+            }
+            arrObj.push({
+                firstName: firstName,
+                lastName: lastName
+            });
+        });
+        this.handleSortingName(arrObj);
+    }
+    //melakukan pengurutan data nama
+    handleSortingName = (arrObj) => {
+        // console.warn(ArrObj);
+        let sortedNames = arrObj.sort((a, b) => {
+            if (a.lastName.toLowerCase() > b.lastName.toLowerCase()) {
+                return 1;
+            } else if (b.lastName.toLowerCase() > a.lastName.toLowerCase()) {
+                return -1;
+            } else {
+                if (a.firstName.toLowerCase() > b.firstName.toLowerCase()) {
+                    return 1;
+                } else if (b.firstName.toLowerCase() > a.firstName.toLowerCase()) {
+                    return -1;
+                } else {
+                    return 0;
+                };
+            };
+        });
+        this.handleBackToArry(sortedNames);
+        // console.warn(sortedNames);
+    }
+    //mengubah array yang sudah diurutkan menjadi string
+    handleBackToArry = (sortedNames) => {
+        let sortedNameArray = [];
+        let fullName;
+        let stringSortedNames = "";
+        sortedNames.forEach(element => {
+            fullName = element.firstName + element.lastName;
+            sortedNameArray.push(fullName);
+        });
+        // console.warn(sortedNameArray);
+        sortedNameArray.forEach(element => {
+            stringSortedNames += element + "\n";
+        });
+
+        this.setState({
+            names: stringSortedNames
+        })
+        console.warn(stringSortedNames);
+    }
+    //mendownload data yang ada pada variable names 
+    handleDownload() {
+        var download = document.querySelector('.download');
+        download.setAttribute('href', 'data:text/plain;charset=utf-8,'
+            + encodeURIComponent(this.state.names));
+        download.setAttribute('download', 'sorted-names-list.txt');
+    }
+    handleChange = () => {
+
+    }
+
+    componentDidMount() {
+        this.handleGetData()
+    }
+
+
+    render() {
+        return (
+            <div className="container">
+                <div className="btn">
+                    <button type="submit" onClick={() => this.handleDataToArray()}>urutkan</button>
+                    <a href="#" className="download" onClick={() => this.handleDownload()}>Download</a>
+                </div>
+                <div className="content">
+                    <textarea name="names" id="" cols="50" rows="10"
+                        value={this.state.names}
+                        onChange={() => this.handleChange()}
+                        disabled></textarea>
+                </div>
+            </div>
+        )
+    }
+
+}
+export default SortNameComp;
