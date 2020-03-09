@@ -2,3 +2,5 @@
 
 -perlu menginstall liblary axios
 
+-menggunakan unit testing untuk beberapa fuction (FarrayData.test.js, FarrayToObj.test.js, FbackToArray.test.js,FsortingNames.test.js) yang berada pada directory service 
+
